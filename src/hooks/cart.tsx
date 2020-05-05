@@ -30,23 +30,86 @@ const CartProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO LOAD ITEMS FROM ASYNC STORAGE
+      // Pega todos os produtos do carrinho.
+      const cart = await AsyncStorage.getItem('@GoMarketplace:cart');
+
+      // Se o carrinho existir ele o joga no products convertido.
+      cart && setProducts(JSON.parse(cart));
     }
 
     loadProducts();
   }, []);
 
-  const addToCart = useCallback(async product => {
-    // TODO ADD A NEW ITEM TO THE CART
-  }, []);
+  const addToCart = useCallback(
+    async product => {
+      // Procura se o produto adicionado ja existe no carrinho
+      const productAddedExists = products.find(p => p.id === product.id);
+      // Se ele existir, mapeia o estado do carrinho e adiciona mais a sua quantidade
+      // e entao atualiza o estado do carrinho e depois coloca no banco do celular.
+      if (productAddedExists) {
+        products.map<Product>(productOnCart => {
+          productOnCart.id === productAddedExists.id
+            ? (productOnCart.quantity += 1)
+            : productOnCart.quantity;
+        });
 
-  const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+        setProducts(products);
 
-  const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+        await AsyncStorage.setItem(
+          '@GoMarketplace:cart',
+          JSON.stringify(products),
+        );
+      } else {
+        // Se o producto adicionado nao existir o estado do carrinho e atualizado com o
+        // valor anteiror mais o novo produto com a quantidade adicionada = 1, e entao
+        // coloca o estado atualizado no banco do celular.
+        setProducts([...products, { ...product, quantity: 1 }]);
+
+        await AsyncStorage.setItem(
+          '@GoMarketplace:cart',
+          JSON.stringify(products),
+        );
+      }
+    },
+    [products],
+  );
+
+  const increment = useCallback(
+    async id => {
+      // Pega o id enviado e verifica com o estado atual do carrinho ate encontrar
+      // o produto com o respectivo id e quando encontra-o adicione +1 a sua quantidade.
+      const productsIncremented = products.map<Product>(product => {
+        if (product.id === id) {
+          product.quantity += 1;
+        }
+        return product;
+      });
+
+      setProducts(productsIncremented);
+
+      await AsyncStorage.setItem(
+        '@GoMarketplace:cart',
+        JSON.stringify(productsIncremented),
+      );
+    },
+    [products],
+  );
+
+  const decrement = useCallback(
+    async id => {
+      const productsDecremented = await products.map<Product>(p => {
+        p.id === id && p.quantity >= 1 ? (p.quantity -= 1) : p.quantity;
+      });
+
+      setProducts(productsDecremented);
+
+      await AsyncStorage.setItem(
+        '@GoMarketplace:cart',
+        JSON.stringify(productsDecremented),
+      );
+    },
+    [products],
+  );
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
