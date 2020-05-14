@@ -24,34 +24,19 @@ const FloatingCart: React.FC = () => {
   const navigation = useNavigation();
 
   const cartTotal = useMemo(() => {
-    // console.log('Tipo de products: ');
-    // console.log(typeof products);
-
-    // const totalOfCart = products.reduce((total, p) => {
-    //   total += p.price * p.quantity;
-    //   return total;
-    // }, 0);
-
-    return formatValue(50);
+    const totalValueInCart = products.reduce((total, p) => {
+      total += p.price * p.quantity;
+      return total;
+    }, 0);
+    return formatValue(totalValueInCart);
   }, [products]);
 
   const totalItensInCart = useMemo(() => {
-    console.log(typeof products);
-
-    if (typeof products != null) {
-      products.map(p => {
-        console.log('################');
-        console.log(p.title);
-        console.log(p.quantity);
-        console.log('################');
-      });
-      const totalQtdOfCart = products.reduce((totalQtd, p) => {
-        totalQtd += p.quantity;
-        return totalQtd;
-      }, 0);
-
-      return 50;
-    }
+    const totalInCart = products.reduce((total, p) => {
+      total += p.quantity;
+      return total;
+    }, 0);
+    return totalInCart;
   }, [products]);
 
   return (

@@ -70,6 +70,10 @@ const CartProvider: React.FC = ({ children }) => {
           JSON.stringify(products),
         );
       }
+      console.log(`Produtos no carrinho`);
+      products.map(p => {
+        console.log(`Nome: ${p.title} - Quantidade: ${p.quantity}`);
+      });
     },
     [products],
   );
@@ -97,8 +101,11 @@ const CartProvider: React.FC = ({ children }) => {
 
   const decrement = useCallback(
     async id => {
-      const productsDecremented = await products.map<Product>(p => {
-        p.id === id && p.quantity >= 1 ? (p.quantity -= 1) : p.quantity;
+      const productsDecremented = products.map<Product>(product => {
+        if (product.id === id) {
+          product.quantity -= 1;
+          return product;
+        }
       });
 
       setProducts(productsDecremented);

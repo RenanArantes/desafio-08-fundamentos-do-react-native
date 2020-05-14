@@ -38,8 +38,8 @@ interface Product {
 const Cart: React.FC = () => {
   const { increment, decrement, products } = useCart();
 
-  console.log('Produtos na pagina Cart.');
-  console.log(products);
+  // console.log('Produtos na pagina Cart.');
+  // console.log(products);
 
   function handleIncrement(id: string): void {
     increment(id);
@@ -50,12 +50,12 @@ const Cart: React.FC = () => {
   }
 
   const cartTotal = useMemo(() => {
-    // const totalOfCart = products.reduce((total, p) => {
-    //   total += p.price * p.quantity;
-    //   return total;
-    // }, 0);
+    const totalOfCart = products.reduce((total, p) => {
+      total += p.price * p.quantity;
+      return total;
+    }, 0);
 
-    return formatValue(50);
+    return formatValue(totalOfCart);
   }, [products]);
 
   const totalItensInCart = useMemo(() => {
